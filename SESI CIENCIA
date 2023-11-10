@@ -4,6 +4,8 @@
 
 //Configuração de Distancia Mínima em centimetros
 const int distancia_carro = 5; 
+const int distancia_Fibra = 15; 
+
 
 //Configurações de Portas do Arduino
 
@@ -14,6 +16,7 @@ const int ECHO = 2;
 //Demais componentes
 
 const int buzzer = 9;
+const int fibra = 8;
 
 // Variaveis para funcionamento do Buzzer
 float seno;
@@ -58,6 +61,26 @@ int sensor_morcego(int pinotrig,int pinoecho){
   digitalWrite(pinotrig,LOW);
 
   return pulseIn(pinoecho,HIGH)/58;
+
+ int distancia = sensor_morcego(TRIG,ECHO);
+
+    if(distancia <= distancia_Fibra){
+      Serial.print("ALERTA: ");
+      Serial.print(distancia);
+      Serial.println("cm");
+      tocaFibra();
+    }
+    else{
+      Serial.print("Livre: ");
+      Serial.print(distancia);
+      Serial.println("cm");
+      noTone(fibra);
+    }
+  delay(100);
+  
+}
+
+
 }
 
 //Função para execução do Alarme Sonoro
@@ -67,64 +90,6 @@ void tocaBuzzer(){
   frequencia = 2000+(int(seno*1000));
   tone(buzzer,frequencia);
   delay(2);
-}
-
-}
-/******************************************************************************/
-/*          Projeto: Protótipo Sensor para Safe Walk - SESI                   */
-/******************************************************************************/
-
-//Configuração de Distancia Mínima em centimetros
-const int distancia_carro = 10; 
-
-//Configurações de Portas do Arduino
-
-//Sensor
-const int TRIG = 3;
-const int ECHO = 2;
-
-//Demais componentes
-const int Fibra = 8;
-
-void setup() {
-  Serial.begin(9600);
-  
-  // Configurações do Sensor
-  pinMode(TRIG,OUTPUT);
-  pinMode(ECHO,INPUT);
-  
-  // Configurações do Fibra
-  pinMode(Fibra, OUTPUT);
-
-}
-
-void loop() {
-  int distancia = sensor_morcego(TRIG,ECHO);
-
-    if(distancia <= distancia_carro){
-      Serial.print("Atenção: ");
-      Serial.print(distancia);
-      Serial.println("cm");
-      digitalWrite(Fibra, HIGH);
-    }
-    else{
-      Serial.print("Livre: ");
-      Serial.print(distancia);
-      Serial.println("cm");
-      digitalWrite(Fibra, LOW);
-    }
-  delay(100);
-  
-}
-
-int sensor_morcego(int pinotrig,int pinoecho){
-  digitalWrite(pinotrig,LOW);
-  delayMicroseconds(2);
-  digitalWrite(pinotrig,HIGH);
-  delayMicroseconds(10);
-  digitalWrite(pinotrig,LOW);
-
-  return pulseIn(pinoecho,HIGH)/58;
 }
 
 }
