@@ -41,12 +41,16 @@ void loop() {
       Serial.print("Atenção: ");
       Serial.print(distancia);
       Serial.println("cm");
+      digitalWrite(ledGreen, LOW);
+      digitalWrite(ledRed, HIGH);
       tocaBuzzer();
     }
     else{
       Serial.print("Livre: ");
       Serial.print(distancia);
       Serial.println("cm");
+      digitalWrite(ledGreen, HIGH);
+      digitalWrite(ledRed, LOW);
       noTone(buzzer);
     }
   delay(100);
@@ -63,9 +67,6 @@ int sensor_morcego(int pinotrig,int pinoecho){
   return pulseIn(pinoecho,HIGH)/58;
 }
 
-
-}
-
 //Função para execução do Alarme Sonoro
 void tocaBuzzer(){
  for(int x=0;x<180;x++){
@@ -75,4 +76,3 @@ void tocaBuzzer(){
   delay(2);
 }
 
-}
