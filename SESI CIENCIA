@@ -61,7 +61,6 @@ int sensor_morcego(int pinotrig,int pinoecho){
   digitalWrite(pinotrig,LOW);
 
   return pulseIn(pinoecho,HIGH)/58;
-  
 }
 
 
