@@ -61,22 +61,6 @@ int sensor_morcego(int pinotrig,int pinoecho){
   digitalWrite(pinotrig,LOW);
 
   return pulseIn(pinoecho,HIGH)/58;
-
- int distancia = sensor_morcego(TRIG,ECHO);
-
-    if(distancia <= distancia_Fibra){
-      Serial.print("ALERTA: ");
-      Serial.print(distancia);
-      Serial.println("cm");
-      tocaFibra();
-    }
-    else{
-      Serial.print("Livre: ");
-      Serial.print(distancia);
-      Serial.println("cm");
-      noTone(fibra);
-    }
-  delay(100);
   
 }
 
