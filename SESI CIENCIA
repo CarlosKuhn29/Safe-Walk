@@ -4,7 +4,7 @@
 
 //Configuração de Distancia Mínima em centimetros
 const int distancia_carro = 5; 
-const int distancia_Vibra = 15; 
+const int distancia_Fibra = 15; 
 
 
 //Configurações de Portas do Arduino
@@ -40,7 +40,7 @@ void loop() {
 
   int distancia = sensor_morcego(TRIG,ECHO);
 
-    if(distancia <= distancia_Vibra){
+    if(distancia <= distancia_Fibra){
       Serial.print("ALERTA: ");
       Serial.print(distancia);
       Serial.println("cm");
