@@ -4,7 +4,7 @@
 
 //Configuração de Distancia Mínima em centimetros
 const int distancia_carro = 5; 
-const int distancia_Fibra = 15; 
+const int distancia_Vibra = 15; 
 
 
 //Configurações de Portas do Arduino
@@ -16,7 +16,7 @@ const int ECHO = 2;
 //Demais componentes
 
 const int buzzer = 9;
-const int fibra = 8;
+const int vibra = 8;
 
 // Variaveis para funcionamento do Buzzer
 float seno;
@@ -31,6 +31,7 @@ void setup() {
   
   //Configurações do Buzzer
   pinMode(buzzer, OUTPUT); 
+  pinMode(vibra, OUTPUT);
   
 }
 
@@ -41,16 +42,12 @@ void loop() {
       Serial.print("Atenção: ");
       Serial.print(distancia);
       Serial.println("cm");
-      digitalWrite(ledGreen, LOW);
-      digitalWrite(ledRed, HIGH);
       tocaBuzzer();
     }
     else{
       Serial.print("Livre: ");
       Serial.print(distancia);
       Serial.println("cm");
-      digitalWrite(ledGreen, HIGH);
-      digitalWrite(ledRed, LOW);
       noTone(buzzer);
     }
   delay(100);
@@ -75,4 +72,30 @@ void tocaBuzzer(){
   tone(buzzer,frequencia);
   delay(2);
 }
+
+}
+
+//Funcionamento do Vibracall
+void loop() {
+
+  int distancia = sensor_morcego(TRIG,ECHO);
+
+    if(distancia <= distancia_Vibra){
+      Serial.print("ALERTA: ");
+      Serial.print(distancia);
+      Serial.println("cm");
+      digitalWrite(vibra, HIGH);
+      delay(1741);
+      digitalWrite(vibra, LOW);
+      delay(741);
+      }
+    else{
+      Serial.print("Livre: ");
+      Serial.print(distancia);
+      Serial.println("cm");
+      digitalWrite(vibra, LOW);
+    } //end else
+
+  
+} //end stop
 
