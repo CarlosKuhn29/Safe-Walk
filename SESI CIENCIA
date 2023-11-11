@@ -35,8 +35,26 @@ void setup() {
   
 }
 
+//Funcionamento do Vibracall
 void loop() {
+
   int distancia = sensor_morcego(TRIG,ECHO);
+
+    if(distancia <= distancia_Vibra){
+      Serial.print("ALERTA: ");
+      Serial.print(distancia);
+      Serial.println("cm");
+      digitalWrite(vibra, HIGH);
+      delay(100);
+      digitalWrite(vibra, LOW);
+      delay(10);
+      }
+    else{
+      Serial.print("Livre: ");
+      Serial.print(distancia);
+      Serial.println("cm");
+      digitalWrite(vibra, LOW);
+    } //end else
 
     if(distancia <= distancia_carro){
       Serial.print("Atenção: ");
@@ -45,23 +63,10 @@ void loop() {
       tocaBuzzer();
     }
     else{
-      Serial.print("Livre: ");
-      Serial.print(distancia);
-      Serial.println("cm");
       noTone(buzzer);
     }
   delay(100);
   
-}
-
-int sensor_morcego(int pinotrig,int pinoecho){
-  digitalWrite(pinotrig,LOW);
-  delayMicroseconds(2);
-  digitalWrite(pinotrig,HIGH);
-  delayMicroseconds(10);
-  digitalWrite(pinotrig,LOW);
-
-  return pulseIn(pinoecho,HIGH)/58;
 }
 
 //Função para execução do Alarme Sonoro
@@ -75,27 +80,14 @@ void tocaBuzzer(){
 
 }
 
-//Funcionamento do Vibracall
-void loop() {
+//Função morcego
 
-  int distancia = sensor_morcego(TRIG,ECHO);
+int sensor_morcego(int pinotrig,int pinoecho){
+  digitalWrite(pinotrig,LOW);
+  delayMicroseconds(2);
+  digitalWrite(pinotrig,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(pinotrig,LOW);
 
-    if(distancia <= distancia_Vibra){
-      Serial.print("ALERTA: ");
-      Serial.print(distancia);
-      Serial.println("cm");
-      digitalWrite(vibra, HIGH);
-      delay(1741);
-      digitalWrite(vibra, LOW);
-      delay(741);
-      }
-    else{
-      Serial.print("Livre: ");
-      Serial.print(distancia);
-      Serial.println("cm");
-      digitalWrite(vibra, LOW);
-    } //end else
-
-  
-} //end stop
-
+  return pulseIn(pinoecho,HIGH)/58;
+}
