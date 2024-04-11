@@ -10,13 +10,13 @@ const int distancia_Fibra = 15;
 //Configurações de Portas do Arduino
 
 //Sensor
-const int TRIG = 3;
-const int ECHO = 2;
+const int TRIG = 4;
+const int ECHO = 3;
 
 //Demais componentes
 
-const int buzzer = 9;
-const int vibra = 8;
+const int buzzer = 2;
+const int vibra = 5;
 
 // Variaveis para funcionamento do Buzzer
 float seno;
