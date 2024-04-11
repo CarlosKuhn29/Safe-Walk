@@ -3,7 +3,7 @@
 /******************************************************************************/
 
 //Configuração de Distancia Mínima em centimetros
-const int distancia_carro = 5; 
+const int distancia_Buzzer = 5; 
 const int distancia_Fibra = 15; 
 
 
@@ -56,7 +56,7 @@ void loop() {
       digitalWrite(vibra, LOW);
     } //end else
 
-    if(distancia <= distancia_carro){
+    if(distancia <= distancia_Buzzer){
       Serial.print("Atenção: ");
       Serial.print(distancia);
       Serial.println("cm");
