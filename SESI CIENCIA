@@ -10,8 +10,8 @@ const int distancia_Fibra = 15;
 //Configurações de Portas do Arduino
 
 //Sensor
-const int TRIG = 4;
-const int ECHO = 3;
+const int TRIG = 7;
+const int ECHO = 6;
 
 //Demais componentes
 
