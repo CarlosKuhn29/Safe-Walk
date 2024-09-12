@@ -1,0 +1,69 @@
+int pinTrigger = 2; // pino usado para disparar os pulsos do sensor
+int pinEcho = 3; // pino usado para ler os pulsos refletidos
+int pinBuzina = 9; //pino da buzina
+
+
+
+float tempoEcho = 0; // variável tempo do eco
+const float velocidadeSom_mps = 340; // em metros por segundo (340.292)
+const float velocidadeSom_mpus = 0.000340; // em metros por microsegundo
+int timeRepeatUltrassonico = 200;//tempo de repetição de leitura
+float dist = 0;
+void setup()
+{
+ 
+  
+  pinMode(pinTrigger, OUTPUT); // configura pino Trigger como saída
+  digitalWrite(pinTrigger, LOW); // pino trigger - nível baixo
+  pinMode(pinEcho, INPUT); // configura pino ECHO como entrada
+  Serial.begin(9200); // inicializa monitor serial 9600 Bps (Bits por segundos)
+  pinMode(pinBuzina, OUTPUT);
+  delay(100); // atraso de 100 milisegundos
+
+  //pinMode(vccDisplay,OUTPUT);
+  //digitalWrite(vccDisplay,HIGH);
+}
+void loop()
+{
+
+  
+  disparaPulsoUltrassonico(); // dispara pulso ultrassonico
+  tempoEcho = pulseIn(pinEcho, HIGH); // mede duração do pulso HIGH de eco em microsegundos
+  dist = calculaDistancia(tempoEcho) * 100; //DISTÂNCIA EM CENTÍMETROS
+int  displayNumber(dist);
+  Serial.print(dist); // mostra o calculo de distancia em cm
+  Serial.println(" cm.");
+  if (dist >= 30)
+  {
+    delay(timeRepeatUltrassonico);
+  }
+  else
+  {
+    velocidadeBuzina(round(1 + (30 - floor(dist)) / 5)); //buzina por "TimeRepeatUltrassonico" segundos
+  }
+}
+
+void disparaPulsoUltrassonico()
+{
+  digitalWrite(pinTrigger, HIGH); // pulso alto de Trigger
+  delayMicroseconds(10); // atraso de 3 milisegundos (em 3 milisegundos a onda progagou-se por 1,02 metros)
+  digitalWrite(pinTrigger, LOW); // pulso baixo de Trigger
+}
+
+
+void velocidadeBuzina(int intensity)
+{
+  //Serial.println(intensity);
+  for (int i = 0; i < round(intensity); i++) {
+    digitalWrite(pinBuzina, HIGH);
+    delay(timeRepeatUltrassonico / (1 * intensity)); //liga
+    digitalWrite(pinBuzina, LOW);
+    delay(timeRepeatUltrassonico / (1 * intensity)); //desliga
+  }
+
+}
+
+float calculaDistancia(float tempo_us)
+{
+  return ((tempo_us * velocidadeSom_mpus) / 2 ); // calcula distancia em metros
+}
