@@ -1,0 +1,101 @@
+// Definições dos pinos
+const int trigPin = 9;    // Pino TRIG do sensor ultrassônico
+const int echoPin = 10;   // Pino ECHO do sensor ultrassônico
+const int buzzerPin = 11; // Pino do buzzer
+const int motorPin = 6;   // Pino do motor vibracional
+ 
+long duration;
+float distance;
+ 
+unsigned long previousBuzzerMillis = 0;
+unsigned long previousMotorMillis = 0;
+unsigned long buzzerOnMillis = 0;
+unsigned long motorOnMillis = 0;
+ 
+int buzzerInterval = 1000; // Intervalo inicial do buzzer (em ms)
+int motorInterval = 1000;  // Intervalo inicial do motor (em ms)
+bool buzzerState = LOW;
+bool motorState = LOW;
+ 
+// Função para medir a distância
+float medirDistancia() {
+  // Envia um pulso de 10µs para o TRIG
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  // Calcula o tempo de retorno do pulso
+  duration = pulseIn(echoPin, HIGH);
+  // Converte o tempo em distância (em cm)
+  float distanceCm = (duration * 0.034) / 2;
+  return distanceCm;
+}
+ 
+void setup() {
+  // Inicializa os pinos
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(motorPin, OUTPUT);
+ 
+  // Inicia a comunicação serial
+  Serial.begin(9600);
+}
+ 
+void loop() {
+  // Mede a distância
+  distance = medirDistancia();
+  // Exibe a distância no monitor serial
+  Serial.print("Distancia: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+ 
+  // Buzzer: intervalo inversamente proporcional à distância (entre 0 e 50 cm)
+  if (distance <= 50) {
+    buzzerInterval = map(distance, 0, 50, 100, 1000); // Intervalo entre os bips, quanto mais próximo, menor o intervalo
+ 
+    unsigned long currentMillis = millis();
+ 
+    // Verifica se é hora de ligar ou desligar o buzzer
+    if (buzzerState == LOW && currentMillis - previousBuzzerMillis >= buzzerInterval) {
+      previousBuzzerMillis = currentMillis;
+      buzzerState = HIGH;
+      digitalWrite(buzzerPin, HIGH); // Liga o buzzer
+      buzzerOnMillis = currentMillis;
+    }
+ 
+    // Desliga o buzzer após 100ms
+    if (buzzerState == HIGH && currentMillis - buzzerOnMillis >= 100) {
+      buzzerState = LOW;
+      digitalWrite(buzzerPin, LOW); // Desliga o buzzer
+    }
+  } else {
+    digitalWrite(buzzerPin, LOW); // Desliga o buzzer se a distância for maior que 50 cm
+  }
+ 
+  // Motor vibracional: intervalo inversamente proporcional à distância (entre 0 e 100 cm)
+  if (distance <= 100) {
+    motorInterval = map(distance, 0, 100, 200, 1000); // Intervalo entre as vibrações
+ 
+    unsigned long currentMillis = millis();
+ 
+    // Verifica se é hora de ligar ou desligar o motor
+    if (motorState == LOW && currentMillis - previousMotorMillis >= motorInterval) {
+      previousMotorMillis = currentMillis;
+      motorState = HIGH;
+      digitalWrite(motorPin, HIGH); // Liga o motor
+      motorOnMillis = currentMillis;
+    }
+ 
+    // Desliga o motor após 100ms
+    if (motorState == HIGH && currentMillis - motorOnMillis >= 100) {
+      motorState = LOW;
+      digitalWrite(motorPin, LOW); // Desliga o motor
+    }
+  } else {
+    digitalWrite(motorPin, LOW); // Desliga o motor se a distância for maior que 100 cm
+  }
+  // Pequeno atraso para estabilidade do sensor
+  delayMicroseconds(50);
+}
