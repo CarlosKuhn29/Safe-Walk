@@ -1,0 +1,125 @@
+/*
+This example shows how to take simple range measurements with the VL53L1X. The
+range readings are in units of mm.
+*/
+
+#include <Wire.h>
+#include <VL53L1X.h>
+
+VL53L1X sensor;
+
+// Definições dos pinos
+const int buzzerPin = 7; // Pino do buzzer
+const int motorPin = 6;   // Pino do motor vibracional
+ 
+long duration;
+float distance;
+ 
+unsigned long previousBuzzerMillis = 0;
+unsigned long previousMotorMillis = 0;
+unsigned long buzzerOnMillis = 0;
+unsigned long motorOnMillis = 0;
+ 
+int buzzerInterval = 1000; // Intervalo inicial do buzzer (em ms)
+int motorInterval = 1000;  // Intervalo inicial do motor (em ms)
+bool buzzerState = LOW;
+bool motorState = LOW;
+ 
+
+void setup()
+
+// Inicializa os pinos
+{
+{
+  pinMode( buzzerPin, OUTPUT );
+  pinMode( motorPin, OUTPUT );
+  
+}
+  //while (!Serial) {}
+  Serial.begin(115200);
+  Wire.begin();
+  Wire.setClock(400000); // use 400 kHz I2C
+
+  sensor.setTimeout(500);
+  if (!sensor.init())
+  {
+    Serial.println("Failed to detect and initialize sensor!");
+    while (1);
+  }
+
+  // Use long distance mode and allow up to 50000 us (50 ms) for a measurement.
+  // You can change these settings to adjust the performance of the sensor, but
+  // the minimum timing budget is 20 ms for short distance mode and 33 ms for
+  // medium and long distance modes. See the VL53L1X datasheet for more
+  // information on range and timing limits.
+  sensor.setDistanceMode(VL53L1X::Long);
+  sensor.setMeasurementTimingBudget(50000);
+
+  // Start continuous readings at a rate of one measurement every 50 ms (the
+  // inter-measurement period). This period should be at least as long as the
+  // timing budget.
+  sensor.startContinuous(50);
+}
+
+void loop()
+{
+ { Serial.print(sensor.read());
+  if (sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
+
+ }
+
+  // Mede a distância
+  distance = sensor.read();
+  // Exibe a distância no monitor serial
+  Serial.print("Distancia: ");
+  Serial.print(distance);
+  Serial.println(" Mm");
+
+   // Buzzer: intervalo inversamente proporcional à distância (entre 0 e 50 cm)
+  if (distance <= 500) {
+    buzzerInterval = map(distance, 1, 500, 1000, 10000); // Intervalo entre os bips, quanto mais próximo, menor o intervalo
+ 
+    unsigned long currentMillis = millis();
+ 
+    // Verifica se é hora de ligar ou desligar o buzzer
+    if (buzzerState == LOW && currentMillis - previousBuzzerMillis >= buzzerInterval) {
+      previousBuzzerMillis = currentMillis;
+      buzzerState = HIGH;
+      digitalWrite(buzzerPin, HIGH); // Liga o buzzer
+      buzzerOnMillis = currentMillis;
+    }
+ 
+    // Desliga o buzzer após 100ms
+    if (buzzerState == HIGH && currentMillis - buzzerOnMillis >= 100) {
+      buzzerState = LOW;
+      digitalWrite(buzzerPin, LOW); // Desliga o buzzer
+    }
+  } else {
+    digitalWrite(buzzerPin, LOW); // Desliga o buzzer se a distância for maior que 50 cm
+  }
+ 
+  // Motor vibracional: intervalo inversamente proporcional à distância (entre 0 e 100 cm)
+  if (distance <= 1000) {
+    motorInterval = map(distance, 1, 1000, 2000, 10000); // Intervalo entre as vibrações
+ 
+    unsigned long currentMillis = millis();
+ 
+    // Verifica se é hora de ligar ou desligar o motor
+    if (motorState == LOW && currentMillis - previousMotorMillis >= motorInterval) {
+      previousMotorMillis = currentMillis;
+      motorState = HIGH;
+      digitalWrite(motorPin, HIGH); // Liga o motor
+      motorOnMillis = currentMillis;
+    }
+ 
+    // Desliga o motor após 100ms
+    if (motorState == HIGH && currentMillis - motorOnMillis >= 100) {
+      motorState = LOW;
+      digitalWrite(motorPin, LOW); // Desliga o motor
+    }
+  } else {
+    digitalWrite(motorPin, LOW); // Desliga o motor se a distância for maior que 100 cm
+  }
+  // Pequeno atraso para estabilidade do sensor
+  delayMicroseconds(50);
+}
